@@ -1,0 +1,7 @@
+
+A slower version to compress large sequences
+
+it receives a second parameter <MB> and does its best to perform as fast
+as possible while not exceeding that space.
+
+implemented for irepair and bal/ as well

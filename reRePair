@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+
+import sys, time, argparse, subprocess, os.path, tempfile
+from psutil import virtual_memory
+
+Description = """
+Prefix-free parsing + Repair compression
+
+  Compression:
+     {exe} file [options]
+  creates compressed files file.C and file.R
+
+  Decompression:
+     {exe} -d file [options]
+  decompresses file.C and file.R to file.out          
+"""
+
+# path of the auxiliary tools
+# ctph parsing 
+parse_exe = "src/ctph/pscan.x"
+iparse_exe = "src/ctph/newscan.x"
+parseNT_exe = "src/ctph/newscanNT.x"
+# repair: plain and with memory constraint (symbols are integers in both tools) 
+repair_exe = "src/repair/irepair"
+largerepair_exe = "src/largeb_repair/irepair"
+# old version not producing balanced grammars
+# largerepair_exe = "src/large_repair/irepair" 
+# despair for byte symbols 
+despair_exe = "src/repair/despair"
+# despair for int32 symbols 
+integer_despair_exe = "src/idespairN"
+# preprocess dict into a sequence of int32 representing both chars and distinct EOS 
+preprocess_exe = "src/procdic"
+integer_preprocess_exe = "src/iprocdicN"
+# create final output file
+postprocess_exe = "src/postprocN"
+integer_postprocess_exe = "src/ipostprocN"
+
+def main():
+  show_command_line(sys.stderr)
+  parser = argparse.ArgumentParser(description=Description.format(exe=sys.argv[0]), formatter_class=argparse.RawTextHelpFormatter)
+  parser.add_argument('input', help='input file name', type=str)
+  parser.add_argument('-w', '--wsize', help='sliding window size (def. 10)', default=10, type=int)
+  parser.add_argument('-p', '--mod', help='hash modulus (def. 100)', default=100, type=int)
+  parser.add_argument('-t', help='number of helper threads (def. None)', default=0, type=int)
+  parser.add_argument('-d', help='decompress',action='store_true')
+  parser.add_argument('-c', help='decompress and check',action='store_true')
+  parser.add_argument('-r', help='compression full report',action='store_true')
+  parser.add_argument('-m', help='force repair to use at most M MBs (def. 95%% of available RAM)',default=-1, type=int)
+  parser.add_argument('-k', help='keep intermediate files',action='store_true')
+  parser.add_argument('-i', help='input symbols are integers',action='store_true')
+  parser.add_argument('-v', help="verbose", action='store_true')
+  args = parser.parse_args()
+  # if no max RAM provided on command line uses 95% of total 
+  if(args.m<0):
+    mem = virtual_memory().total
+    args.m = max(1,int(0.95*mem/2**20)) # avoid accidental 0 since it triggers plain repair w/out memory constraints 
+
+  logfile_name = args.input + ".log"
+  # get absolute path to main bigrepair directory 
+  args.main_dir = os.path.dirname(os.path.abspath(__file__))
+  print("Sending logging messages to file:", logfile_name)
+  with open(logfile_name,"a") as logfile:
+    start0 = start = time.time()
+    if(args.d or args.c): # decompress and check
+      exe = integer_despair_exe
+      command = "{exe} {file}".format(
+                exe = os.path.join(args.main_dir,exe), file=args.input)
+      print("==== Decompressing C+R files.\nCommand:", command)
+      if(execute_command(command,logfile)!=True):
+        return
+      print("Elapsed time: {0:.4f}".format(time.time()-start0));
+    else:
+        # pfp + repair
+        if not args.k:
+            command = "rm {file}.dict".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        if not args.k:
+            command = "rm -f {file}.parse_old {file}.parse.parse_old".format(file=args.input)
+            #command = "rm -f {file}.parse_old {file}.last {file}.occ {file}.parse".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        # ---------- preprocessing the first dictionary
+        start = time.time()
+        exe = preprocess_exe
+        command = "{exe} {file}.dicz".format(exe = os.path.join(args.main_dir, exe), file=args.input)
+        print("==== Preprocessing the dictionary.\nCommand:", command)
+        if(execute_command(command,logfile)!=True):
+            return
+        preprocess_time = time.time()-start
+        print("Preprocess time: {0:.4f}".format(preprocess_time))
+        if not args.k:
+            command = "rm -f {file}.dicz {file}.dicz.len".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+            # ---------- preprocessing the recursive dictionary (.parse.dicz)
+        start = time.time()
+        exe = integer_preprocess_exe
+        command = "{exe} {file}.parse.dicz".format(exe = os.path.join(args.main_dir, exe), file=args.input)
+        print("==== Preprocessing the recursive dictionary.\nCommand:", command)
+        if(execute_command(command,logfile)!=True):
+            return
+        preprocess_time = time.time()-start
+        print("Preprocess time: {0:.4f}".format(preprocess_time))
+        if not args.k:
+            command = "rm -f {file}.parse.dicz {file}.parse.dicz.len".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+        print("==== procdic Done")
+
+        # repairs
+        # ---------- repair on recursive dictionary (.parse.dicz.int) -> output parse.dicz.int.C, parse.dicz.int.R
+        start = time.time()
+        if args.m==0:     
+            command = "{exe} {file}.parse.dicz.int".format(
+                exe = os.path.join(args.main_dir,repair_exe), file=args.input)
+        else:
+            command = "{exe} {file}.parse.dicz.int {mb}".format(mb=args.m,
+                exe = os.path.join(args.main_dir,largerepair_exe), file=args.input)
+        print("==== Repair recursive dictionary.\nCommand:", command)
+        if(execute_command(command,logfile)!=True):
+            return
+        repair_time = time.time()-start
+        print("repair(dict) time: {0:.4f}".format(repair_time))
+        if not args.k:
+            command = "rm -f {file}.parse.dicz.int".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        # ---------- repair on recursive parse (.parse.parse) -> output .parse.parse.C, .parse.parse.R
+        start = time.time()
+        if args.m==0:     
+            command = "{exe} {file}.parse.parse".format(
+                exe = os.path.join(args.main_dir,repair_exe), file=args.input)
+        else:
+            command = "{exe} {file}.parse.parse {mb}".format(mb=args.m,
+                exe = os.path.join(args.main_dir,largerepair_exe), file=args.input)
+        print("==== Repair recursive parse.\nCommand:", command)
+        if(execute_command(command,logfile)!=True):
+            return
+        repair_time = time.time()-start
+        print("repair(parse) time: {0:.4f}".format(repair_time))
+        if not args.k:
+            command = "rm -f {file}.parse.parse".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        # ---------- repair on dicz (.dicz.int) -> output .parse.C, .parse.R
+        start = time.time()
+        if args.m==0:     
+            command = "{exe} {file}.dicz.int".format(
+                exe = os.path.join(args.main_dir,repair_exe), file=args.input)
+        else:
+            command = "{exe} {file}.dicz.int {mb}".format(mb=args.m,
+                exe = os.path.join(args.main_dir,largerepair_exe), file=args.input)
+        print("==== Repair dictionary.\nCommand:", command)
+        if(execute_command(command,logfile)!=True):
+            return
+        repair_time = time.time()-start
+        print("repair(parse) time: {0:.4f}".format(repair_time))
+        if not args.k:
+            command = "rm -f {file}.dicz.int".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        # ---- postprocess recursive
+        start = time.time()
+        exe = integer_postprocess_exe
+        command = "{exe} {file}.parse".format(
+                exe = os.path.join(args.main_dir,exe), file=args.input)
+        print("==== Postprocessing the dictionary.\nCommand:", command)
+        fp = tempfile.TemporaryFile()
+        if(execute_command(command,logfile,fp)!=True):
+            return      
+        postprocess_time = time.time()-start
+        print("Postprocess time: {0:.4f}".format(postprocess_time))
+        if not args.k:
+            command = "rm -f {file}.parse.dicz.int.C {file}.parse.dicz.int.R {file}.parse.parse.C {file}.parse.parse.R {file}.parse".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        # ---- postprocess
+        start = time.time()
+        exe = postprocess_exe
+        command = "{exe} {file}".format(
+                exe = os.path.join(args.main_dir,exe), file=args.input)
+        print("==== Postprocessing the dictionary.\nCommand:", command)
+        fp = tempfile.TemporaryFile()
+        if(execute_command(command,logfile,fp)!=True):
+            return      
+        postprocess_time = time.time()-start
+        print("Postprocess time: {0:.4f}".format(postprocess_time))
+        if not args.k:
+            command = "rm -f {file}.dicz.int.C {file}.dicz.int.R ".format(file=args.input)
+            if(execute_command(command,logfile)!=True):
+                return
+
+        #if not args.k:
+        #    command = "rm -f {file}.dicz {file}.dicz.int {file}.dicz.int.C {file}.dicz.int.R {file}.dicz.len {file}.parse {file}.parse.C {file}.parse.dicz {file}.parse.dicz.int {file}.parse.dicz.int.C {file}.parse.dicz.int.R {file}.parse.dicz.len {file}.parse.out {file}.parse.parse {file}.parse.parse.C {file}.parse.parse.R {file}.parse.parse_old {file}.parse.R".format(file=args.input)
+        #    if(execute_command(command,logfile)!=True):
+        #        return
+
+def show_command_line(f):
+  f.write("Command line: ") 
+  for x in sys.argv:
+     f.write(x+" ")
+  f.write("\n")   
+
+# compute hash digest for a file 
+def file_digest(name,logfile):
+    try:
+      hash_command = "{exe} {infile}".format(exe=shasum_exe, infile=name)
+      hashsum = subprocess.check_output(hash_command.split(),stderr=logfile)
+      hashsum = hashsum.decode("utf-8").split()[0]
+    except:
+      hashsum = "Error!" 
+    return hashsum  
+      
+# execute command: return True is everything OK, False otherwise
+def execute_command(command,logfile,outfile=None):
+  try:
+    #subprocess.run(command.split(),stdout=logfile,stderr=logfile,check=True,env=env)
+    if not outfile:
+      outfile = logfile
+    subprocess.check_call(command.split(),stdout=outfile,stderr=logfile)
+  except subprocess.CalledProcessError:
+    print("Error executing command line:")
+    print("\t"+ command)
+    print("Check log file: " + logfile.name)
+    return False
+  return True
+
+
+if __name__ == '__main__':
+  main()
