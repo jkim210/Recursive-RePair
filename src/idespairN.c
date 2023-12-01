@@ -64,19 +64,9 @@ size_t expand (unsigned int i, unsigned int d)
      char c;
      //fprintf(stderr, "%d\n", i);
      while (i >= alph) // while i is not a terminal expand recursively
-       { 
-         if (i > 2*recursiveLen) {
-             /*if (debugFlag == 1)
-                 fprintf(stderr, "i-a-r: %d\n", i - alph - recursiveLen);*/
-             ret += expand(R[i - alph - recursiveLen].left, d + 1);
-             i = R[i - alph - recursiveLen].right; d++; // expansion on the right branch is replaced by iteration 
-         }
-         else {
-             /*if (debugFlag == 1)
-                 fprintf(stderr, "i-ar: %d\n", i - alphR);*/
-             ret += expand(R[i - alphR].left, d + 1);
-             i = R[i - alphR].right; d++;  // expansion on the right branch is replaced by iteration 
-         }
+       {
+             ret += expand(R[i - alph - alphR].left, d + 1);
+             i = R[i - alph - alphR].right; d++;  // expansion on the right branch is replaced by iteration
        }
      c = i;
 

@@ -144,8 +144,8 @@ int main(int argc, char** argv)
 	{
 		e = fread(val, sizeof(int), 2, diczR);
 		die(e != 2, "Read error");
-		if (val[0] >= 256) val[0] -= terms - 256 - 2 * Rlen;			//terms - 256 = phrases = # of phrases in dicz = terminals in parseR
-		if (val[1] >= 256) val[1] -= terms - 256 - 2 * Rlen;
+		if (val[0] >= 256) val[0] -= terms - 256 - alpha - Rlen;			//terms - 256 = phrases = # of phrases in dicz = terminals in parseR
+		if (val[1] >= 256) val[1] -= terms - 256 - alpha - Rlen;
 		fwrite(val, sizeof(int), 2, R);
 	}
 	fclose(diczR);
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
 		size_t ni;
 		while ((AdiczC[j] < 256) || (AdiczC[j] >= terms))	//moves the cursor up to the end of a dicz phrase = terminator bc dicz.int
 		{
-			if (AdiczC[j] >= 256) AdiczC[j] -= terms - 256;	//shift rule nonterminals 
+			if (AdiczC[j] >= 256) AdiczC[j] -= terms - alpha - 256;	//shift rule nonterminals 
 			j++;
 		}
 		ni = j + 1;											//ni = next phrase start position, skip terminator
@@ -194,12 +194,12 @@ int main(int argc, char** argv)
 			{
 				val[0] = AdiczC[k++]; val[1] = AdiczC[k++];
 				if (val[0] >= 256)
-					val[0] += 2 * Rlen;
+					val[0] += Rlen;
 				if (val[1] >= 256)
-					val[1] += 2 * Rlen;
+					val[1] += Rlen;
 				fwrite(val, sizeof(int), 2, R);
 				diczCexpLen += 2;
-				AdiczC[ko++] = 256 + rules++;
+				AdiczC[ko++] = 256 + alpha + rules++;
 			}
 			if (k < j) AdiczC[ko++] = AdiczC[k];
 			j = ko;
@@ -219,8 +219,8 @@ int main(int argc, char** argv)
 	for (i = 0; i < p; i++) {
 		/*if (transl[i] < 256)
 			fprintf(stderr, "%d\n", transl[i]);*/
-		if (transl[i] >= 256)
-			transl[i] += 2 * Rlen;
+		if (transl[i] >= 256 + alpha)
+			transl[i] += Rlen;
 	}
 	free(AdiczC);
 

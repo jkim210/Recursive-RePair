@@ -181,9 +181,9 @@ int main (int argc, char **argv)
       die(e!=2,"Read error");
       // right hand side of rules are true terminal or nonterminal (ie not separator)
       assert(val[0]<alpha || val[0]>=terms);
-      if (val[0] >= terms) val[0] -= (terms-alpha);         //if yeast.fasta.parse.dicz is self-referencing
+      if (val[0] >= terms) val[0] -= (terms-alpha-256);         //if yeast.fasta.parse.dicz is self-referencing
       assert(val[1]<alpha || val[1]>=terms);
-      if (val[1] >= terms) val[1] -= (terms-alpha); 
+      if (val[1] >= terms) val[1] -= (terms-alpha-256); 
       fwrite(val,sizeof(int),2,R);
     }
     fclose(diczR);
@@ -210,7 +210,7 @@ int main (int argc, char **argv)
     while (i < sizeC) { 
       int j = i;
       while ((AdiczC[j] < alpha) || (AdiczC[j] >= terms)) // until we reach a separator 
-      { if (AdiczC[j] >= terms) AdiczC[j] -= (terms-alpha); 
+      { if (AdiczC[j] >= terms) AdiczC[j] -= (terms-alpha-256); 
         j++;
       }
       assert(AdiczC[j]>=Unique); // this must be a separator 
@@ -228,7 +228,7 @@ int main (int argc, char **argv)
             else*/
                 val[1] = AdiczC[k++];
           fwrite(val,sizeof(int),2,R);
-          AdiczC[ko++] = alpha + rules++;           // left hand side of the new rule 
+          AdiczC[ko++] = 256 + alpha + rules++;           // left hand side of the new rule 
         }
         if (k < j) AdiczC[ko++] = AdiczC[k];         // odd symbol  
         j = ko;
@@ -278,7 +278,7 @@ int main (int argc, char **argv)
          }
          else {
              //fprintf(stderr, "val[0] L: %d\n", val[0]);
-             val[0] = val[0] - phrases + rules + alpha;
+             val[0] = val[0] - phrases + rules + alpha + 256;
              /*if (val[0] < alpha) fprintf(stderr, "%d ???\n");
              else fprintf(stderr, "%d\n", val[0]);*/
          }
@@ -290,7 +290,7 @@ int main (int argc, char **argv)
          }
          else {
              //fprintf(stderr, "val[1] L: %d\n", val[1]);
-             val[1] = val[1] - phrases + rules + alpha;
+             val[1] = val[1] - phrases + rules + alpha + 256;
              /*if (val[1] < alpha) fprintf(stderr, "%d???\n");
              else fprintf(stderr, "%d\n", val[1]);*/
          }
@@ -362,7 +362,7 @@ int main (int argc, char **argv)
          die(e!=1,"Read error");
          //fprintf(Creadable, "%d | ", val[0]);
          if (val[0] < phrases) val[0] = transl[val[0]];   // terminal in parse replace with grammar (pfp dict)
-         else { val[0] = val[0] - phrases + rules + alpha; }// non terminal shifted   (rules?)          (+2?) (doubtful)
+         else { val[0] = val[0] - phrases + rules + alpha + 256; }// non terminal shifted   (rules?)          (+2?) (doubtful)
 
          /*fprintf(Creadable, "%d, ", val[0]);
          if (upto10 >= 5) {
