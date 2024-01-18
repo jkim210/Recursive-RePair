@@ -2,7 +2,7 @@
 
 ## Installation
 * Download/Clone repository
-* 'reRePair -h' (get usage instruction)
+* `bigrepair -h` (get usage instruction)
 
 Note that `bigrepair` is a Python script so you need at least **Python 3.6** installed.
 
