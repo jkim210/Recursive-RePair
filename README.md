@@ -6,6 +6,14 @@
 
 Note that `bigrepair` is a Python script so you need at least **Python 3.6** installed.
 
+## Dependencies
+*Recursive RePair* requires use of PFP from Marco Oliva: https://github.com/marco-oliva/pfp
+Prior to running *Recursive RePair* run recursive PFP on the input file as shown below:
+
+       pfp++ -t yeast.fasta -c
+       pfp++ -i yeast.fasta.parse -c
+
+This version of PFP also supports VCF files.
 
 ## Usage
 
