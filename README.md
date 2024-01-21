@@ -25,7 +25,7 @@ If no errors occur the files yeast.fasta.C and yeast.fasta.R are created.
 
 To recover the original file, type
 
-       bigrepair -d yeast.fasta
+       reRePair -d yeast.fasta
 
 this command will read the yeast.fasta.C and yeast.fasta.R files and produce a yeast.fasta.out file identical to the original input yeast.fasta. 
 
