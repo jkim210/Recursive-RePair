@@ -29,6 +29,10 @@ To recover the original file, type
 
 this command will read the yeast.fasta.C and yeast.fasta.R files and produce a yeast.fasta.out file identical to the original input yeast.fasta. 
 
+For more options type:
+
+       reRePair -h
+
 
 ## Authors and acknowledgment
 
