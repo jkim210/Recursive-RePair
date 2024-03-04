@@ -1,10 +1,20 @@
-*Recursive RePair* is a grammar compressor for huge files with many repetitions. Recursive RePair uses Recursive Prefix-Free Parsing (PFP) along with RePair to create a grammar and rules. This work is based on BigRepair by Gagie et al.: https://gitlab.com/manzai/bigrepair
+# Recursive RePair (Re<sup>2</sup>Pair)
+
+Recursive RePair (Re<sup>2</sup>Pair) is a grammar based compression scheme designed for compressing large repetetive files. Re<sup>2</sup>Pair applies Recursive Prefix-Free Parsing (PFP) on the input file to parse it into phrases which are later processed by RePair. This work extends and is inspired by [BigRePair](https://gitlab.com/manzai/bigrepair) by Gagie et al. [1].
 
 ## Installation
-* Download/Clone repository
-* `bigrepair -h` (get usage instruction)
 
-Note that `bigrepair` is a Python script so you need at least **Python 3.6** installed.
+To install Re<sup>2</sup>Pair, the following steps should be run.
+```
+git clone https://github.com/jkim210/Recursive-RePair.git
+cd Recursive-RePair/src
+make
+cd ..
+./reRePair -h
+```
+
+> [!NOTE]  
+> `reRePair` is a Python script that requires at least **Python 3.6** installed.
 
 ## Dependencies
 *Recursive RePair* requires use of PFP from Marco Oliva: https://github.com/marco-oliva/pfp
@@ -38,3 +48,5 @@ For more options type:
 
 
 ## References
+
+1. Travis Gagie, Tomohiro I, Giovanni Manzini, Gonzalo Navarro, Hiroshi Sakamoto, Yoshimasa Takabatake: Rpair: Rescaling RePair with Rsync. Proc. SPIRE '19 CoRR abs/1906.00809 (2019)
