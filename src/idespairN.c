@@ -31,7 +31,7 @@ Chile. Blanco Encalada 2120, Santiago, Chile. gnavarro@dcc.uchile.cl
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <limits.h>
+#include <linux/limits.h>
 
 typedef struct
   { unsigned int left,right;
