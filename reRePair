@@ -4,7 +4,7 @@ import sys, time, argparse, subprocess, os.path, tempfile
 from psutil import virtual_memory
 
 Description = """
-Prefix-free parsing + Repair compression
+Recursive Prefix-free Parsing + Repair compression
 
   Compression:
      {exe} file [options]

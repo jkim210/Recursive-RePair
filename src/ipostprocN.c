@@ -24,7 +24,7 @@
 
 //  exit program with error msg if test is true
 
-int Unique = 0x78000000;
+//int Unique = 0x78000000;
 
 void die(int test,const char *msg)
 {
