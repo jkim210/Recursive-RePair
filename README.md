@@ -28,7 +28,7 @@ Assuming that you have installed the aforementioned version of PFP in the `Recur
 
 1. Run PFP on the `yeast.fasta` file
 ```
-./pfp++ -f data/yeast.fasta -w 10 -p 100 -c
+./pfp++ -t data/yeast.fasta -w 10 -p 100 -c
 ````
 This should produce the following file in the `data` directory: `yeast.fasta.dict`, `yeast.fasta.dicz`, `yeast.fasta.dicz.len`, `yeast.fasta.parse`
 
