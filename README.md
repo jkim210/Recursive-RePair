@@ -38,9 +38,6 @@ This should produce the following file in the `data` directory: `yeast.fasta.dic
 ```
 This should produce the following file in the `data` directory: `yeast.fasta.parse.dict`, `yeast.fasta.parse.dicz`, `yeast.fasta.parse.dicz.len`, `yeast.fasta.parse.parse`       
 
-> [!NOTE]  
->  This version of PFP also supports VCF files. To use VCF files, modify the first PFP command with the appropriate VCF settings.
-
 ## Usage
 
 Assuming that recursive PFP was applied correctly earlier, to build the grammar for the `yeast.fasta` file just type on the command line:
