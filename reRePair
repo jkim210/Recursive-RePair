@@ -42,7 +42,7 @@ def main():
   parser.add_argument('input', help='input file name', type=str)
   parser.add_argument('-w', '--wsize', help='sliding window size (def. 10)', default=10, type=int)
   parser.add_argument('-p', '--mod', help='hash modulus (def. 100)', default=100, type=int)
-  parser.add_argument('-t', help='number of helper threads (def. None)', default=0, type=int)
+  #parser.add_argument('-t', help='number of helper threads (def. None)', default=0, type=int)
   parser.add_argument('-d', help='decompress',action='store_true')
   parser.add_argument('-c', help='decompress and check',action='store_true')
   parser.add_argument('-r', help='compression full report',action='store_true')
@@ -179,7 +179,7 @@ def main():
         postprocess_time = time.time()-start
         print("Postprocess time: {0:.4f}".format(postprocess_time))
         if not args.k:
-            command = "rm -f {file}.parse.dicz.int.C {file}.parse.dicz.int.R {file}.parse.parse.C {file}.parse.parse.R {file}.parse".format(file=args.input)
+            command = "rm -f {file}.parse.dicz.int.C {file}.parse.dicz.int.R {file}.parse.parse.C {file}.parse.parse.R {file}.parse {file}.parse.dict".format(file=args.input)
             if(execute_command(command,logfile)!=True):
                 return
 
