@@ -89,7 +89,7 @@ int main (int argc, char **argv)
       e = fread(&c,sizeof(int),1,fi);
       if(e!=1) {perror("Unexpected end of dictionary"); exit(1); }
       if(c<0 || c>=Unique) {fprintf(stderr, "Dictionary symbol %x larger than %x\n",c,Unique-1); exit(1);} 
-      if (c > 10) {
+      if (c > 10) {  //constant 10 here must match parameter integers_shift in Marco's pfp++ (default is 10)
           c -= 10;
           e = fwrite(&c, sizeof(int), 1, fo); // write int to output file 
           //fprintf(rd, "%d ", c);
