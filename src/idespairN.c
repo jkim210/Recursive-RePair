@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 Author's contact: Gonzalo Navarro, Dept. of Computer Science, University of
 Chile. Blanco Encalada 2120, Santiago, Chile. gnavarro@dcc.uchile.cl
 
+Modified by Justin Kim for use in reRePair
 */
 
 #include <stdlib.h>
