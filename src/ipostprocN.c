@@ -1,18 +1,10 @@
-// ipostproc.c
+// ipostprocN.c
 //
-// Final tool for bigRepair for integers 
-// combines a IRePair compression for the dictionary and the parse into
+// Intermediate tool for reRePair for recursive dictionary and parse (.parse.dicz, .parse.parse)
+// combines a IRePair compression for the recursive dictionary and parse into
 // a IRePair compression for the original input
 
-// derived from postproc.c and modified for the case where
-// the input alphabet of prefix free parsing consists of integers
- 
-// file.dicz.int.R contains rules for dictionary words, first int is # of terminals
-// file.dicz.int.C contains the sequences, separated by terminals >= Unique
-// for each sequence, create balanced rules to convert it into one nonterminal
-// the terminals in file.parse must be renamed as these one nonterminals
-// and the nonterminals must be shifted accordingly
-// the rules of .parse.R and .dicz.int.R must be appended
+// Modified by Justin Kim from ipostproc.c
 
 #include <stdlib.h>
 #include <stdio.h>
