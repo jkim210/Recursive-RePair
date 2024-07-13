@@ -30,7 +30,7 @@ despair_exe = "src/repair/despair"
 # despair for int32 symbols 
 integer_despair_exe = "src/idespairN"
 # preprocess dict into a sequence of int32 representing both chars and distinct EOS 
-preprocess_exe = "src/procdic"
+preprocess_exe = "src/procdicN"
 integer_preprocess_exe = "src/iprocdicN"
 # create final output file
 postprocess_exe = "src/postprocN"
@@ -48,7 +48,7 @@ def main():
   parser.add_argument('-r', help='compression full report',action='store_true')
   parser.add_argument('-m', help='force repair to use at most M MBs (def. 95%% of available RAM)',default=-1, type=int)
   parser.add_argument('-k', help='keep intermediate files',action='store_true')
-  parser.add_argument('-i', help='input symbols are integers',action='store_true')
+  #parser.add_argument('-i', help='input symbols are integers',action='store_true')
   parser.add_argument('-v', help="verbose", action='store_true')
   args = parser.parse_args()
   # if no max RAM provided on command line uses 95% of total 
