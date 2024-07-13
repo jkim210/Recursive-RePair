@@ -43,7 +43,7 @@ This should produce the following file in the `data` directory: `yeast.fasta.par
 Assuming that recursive PFP was applied correctly earlier, to build the grammar for the `yeast.fasta` file just type on the command line:
 
 ```
-./reRePair -i data/yeast.fasta -k
+./reRePair data/yeast.fasta -k
 ```
 
 In the `data` directory, the following files `yeast.fasta.C` and `yeast.fasta.R` will be created if no errors occured.
