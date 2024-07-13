@@ -30,7 +30,7 @@ int main (int argc, char **argv)
 { 
   char foname[1024], flname[1024];
   FILE *fi,*fo, *fl;
-  //int Unique = 0x78000000;
+  int Unique = 0x78000000;
   int n= Unique;  // first integer value used as a separator
   int c;
   fputs("==== Command line:\n",stderr);
@@ -89,7 +89,7 @@ int main (int argc, char **argv)
       e = fread(&c,sizeof(int),1,fi);
       if(e!=1) {perror("Unexpected end of dictionary"); exit(1); }
       if(c<0 || c>=Unique) {fprintf(stderr, "Dictionary symbol %x larger than %x\n",c,Unique-1); exit(1);} 
-      if (c > 10) {  //constant 10 here must match parameter integers_shift in Marco's pfp++ (default is 10)
+      if (c > 10) { //constant 10 here must match parameter integers_shift in Marco's pfp++ (default is 10)
           c -= 10;
           e = fwrite(&c, sizeof(int), 1, fo); // write int to output file 
           //fprintf(rd, "%d ", c);
@@ -98,12 +98,12 @@ int main (int argc, char **argv)
       if(e!=1) {perror("Error writing to .int file"); exit(1); }
     }
 
-    if (skipped > 0) {  //shorten word length by # of dollar symbols
+    /*if (skipped > 0) {  //shorten word length by # of dollar symbols
         fseek(fl, -1 * sizeof(int), SEEK_CUR);
         wlen -= skipped;
         e = fwrite(&wlen, sizeof(int), 1, fl);
         if (e != 1) { perror("Error overwriting entry in .dicz.len file"); exit(1); }
-    }
+    }*/
     e = fwrite (&n,sizeof(int),1,fo); // write terminator as an int to output file 
     //fprintf(rd, "\n");
     if(e!=1) {perror("Error writing to .int file"); exit(1); }
