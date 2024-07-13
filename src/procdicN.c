@@ -8,6 +8,9 @@
 // the lengths of dictionary strings are provided in a separate .len file
 // in int32_t integers. 
 
+// modified by Justin Kim for usage with PFP++ by Marco Oliva
+// for use with dictionaries from character inputs
+
 // input: file.dicz & file.dicz.len
 // output: file.dicz.int
 
