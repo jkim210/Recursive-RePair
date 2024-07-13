@@ -1,16 +1,11 @@
-// postproc.c
+// postprocN.c
 //
-// final tool for bigRepair for chars  
-// combines a IRePair compression for the dictionary and the parse into
+// Final tool for reRePair
+// combines a IRePair compression for the dictionary and the parse with
+// the IRePair compression for the recursive dictionary and parse from ipostprocN into
 // a RePair compression for the original input
 
-// file.dicz.int.R contains rules for dictionary words, first int is # of terminals
-// file.dicz.int.C contains the sequences, separated by terminals >= 256
-// for each sequence (=original dictionary word), create balanced rules 
-// to convert it into one nonterminal
-// the terminals in file.parse must be renamed as these nonterminals
-// and the nonterminals must be shifted accordingly
-// the rules of .parse.R and .dicz.int.R must be appended
+// Modified by Justin Kim from postproc.c
 
 #include <stdlib.h>
 #include <stdio.h>
