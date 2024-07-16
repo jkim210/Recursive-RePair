@@ -3,7 +3,7 @@ CFLAGS=-g -Wall -std=c99
 CC=gcc 
 
 # executables in this directory
-EXECS=procdicN iprocdicN idespairN ipostprocN iprocdicN postprocN
+EXECS=procdicN iprocdicN idespairN ipostprocN postprocN
 
 # targets not producing a file declared phony
 .PHONY: all ctph repair large_repair largeb_repair clean
