@@ -29,7 +29,7 @@ int main (int argc, char **argv)
 { 
   char foname[1024], flname[1024];
   FILE *fi,*fo, *fl;
-  int Unique = 0x78000000;
+  //int Unique = 0x78000000;
   int n= Unique;  // first integer value used as a separator
   int c;
   fputs("==== Command line:\n",stderr);
