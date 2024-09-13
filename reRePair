@@ -28,13 +28,13 @@ largerepair_exe = "src/largeb_repair/irepair"
 # despair for byte symbols 
 despair_exe = "src/repair/despair"
 # despair for int32 symbols 
-integer_despair_exe = "src/idespairN"
+# integer_despair_exe = "src/idespairN"
 # preprocess dict into a sequence of int32 representing both chars and distinct EOS 
-preprocess_exe = "src/procdicN"
-integer_preprocess_exe = "src/iprocdicN"
+preprocess_exe = "src/procdicN2"
+integer_preprocess_exe = "src/iprocdicN2"
 # create final output file
-postprocess_exe = "src/postprocN"
-integer_postprocess_exe = "src/ipostprocN"
+postprocess_exe = "src/postprocN2"
+integer_postprocess_exe = "src/ipostprocN2"
 
 def main():
   show_command_line(sys.stderr)
@@ -48,7 +48,7 @@ def main():
   parser.add_argument('-r', help='compression full report',action='store_true')
   parser.add_argument('-m', help='force repair to use at most M MBs (def. 95%% of available RAM)',default=-1, type=int)
   parser.add_argument('-k', help='keep intermediate files',action='store_true')
-  #parser.add_argument('-i', help='input symbols are integers',action='store_true')
+  parser.add_argument('-i', help='integer shift used in pfp++', default=10, type=int)
   parser.add_argument('-v', help="verbose", action='store_true')
   args = parser.parse_args()
   # if no max RAM provided on command line uses 95% of total 
@@ -63,7 +63,7 @@ def main():
   with open(logfile_name,"a") as logfile:
     start0 = start = time.time()
     if(args.d or args.c): # decompress and check
-      exe = integer_despair_exe
+      exe = despair_exe
       command = "{exe} {file}".format(
                 exe = os.path.join(args.main_dir,exe), file=args.input)
       print("==== Decompressing C+R files.\nCommand:", command)
@@ -79,7 +79,6 @@ def main():
 
         if not args.k:
             command = "rm -f {file}.parse_old {file}.parse.parse_old".format(file=args.input)
-            #command = "rm -f {file}.parse_old {file}.last {file}.occ {file}.parse".format(file=args.input)
             if(execute_command(command,logfile)!=True):
                 return
 
@@ -96,11 +95,12 @@ def main():
             command = "rm -f {file}.dicz {file}.dicz.len".format(file=args.input)
             if(execute_command(command,logfile)!=True):
                 return
+        print("==== procdicN2 Done")
 
-            # ---------- preprocessing the recursive dictionary (.parse.dicz)
+        # ---------- preprocessing the recursive dictionary (.parse.dicz)
         start = time.time()
         exe = integer_preprocess_exe
-        command = "{exe} {file}.parse.dicz".format(exe = os.path.join(args.main_dir, exe), file=args.input)
+        command = "{exe} {file}.parse.dicz {shift}".format(exe = os.path.join(args.main_dir, exe), file=args.input, shift=args.i)
         print("==== Preprocessing the recursive dictionary.\nCommand:", command)
         if(execute_command(command,logfile)!=True):
             return
@@ -110,7 +110,7 @@ def main():
             command = "rm -f {file}.parse.dicz {file}.parse.dicz.len".format(file=args.input)
             if(execute_command(command,logfile)!=True):
                 return
-        print("==== procdic Done")
+        print("==== iprocdicN2 Done")
 
         # repairs
         # ---------- repair on recursive dictionary (.parse.dicz.int) -> output parse.dicz.int.C, parse.dicz.int.R
@@ -125,7 +125,7 @@ def main():
         if(execute_command(command,logfile)!=True):
             return
         repair_time = time.time()-start
-        print("repair(dict) time: {0:.4f}".format(repair_time))
+        print("repair(rec dict) time: {0:.4f}".format(repair_time))
         if not args.k:
             command = "rm -f {file}.parse.dicz.int".format(file=args.input)
             if(execute_command(command,logfile)!=True):
@@ -143,7 +143,7 @@ def main():
         if(execute_command(command,logfile)!=True):
             return
         repair_time = time.time()-start
-        print("repair(parse) time: {0:.4f}".format(repair_time))
+        print("repair(rec parse) time: {0:.4f}".format(repair_time))
         if not args.k:
             command = "rm -f {file}.parse.parse".format(file=args.input)
             if(execute_command(command,logfile)!=True):
@@ -161,7 +161,7 @@ def main():
         if(execute_command(command,logfile)!=True):
             return
         repair_time = time.time()-start
-        print("repair(parse) time: {0:.4f}".format(repair_time))
+        print("repair(dict) time: {0:.4f}".format(repair_time))
         if not args.k:
             command = "rm -f {file}.dicz.int".format(file=args.input)
             if(execute_command(command,logfile)!=True):
@@ -172,7 +172,7 @@ def main():
         exe = integer_postprocess_exe
         command = "{exe} {file}.parse".format(
                 exe = os.path.join(args.main_dir,exe), file=args.input)
-        print("==== Postprocessing the dictionary.\nCommand:", command)
+        print("==== Postprocessing the recursive dictionary.\nCommand:", command)
         fp = tempfile.TemporaryFile()
         if(execute_command(command,logfile,fp)!=True):
             return      
