@@ -86,10 +86,10 @@ int main(int argc, char **argv)
     fprintf(stderr, " %s", argv[i]);
   fputs("\n", stderr);
 
-  if (argc != 2)
+  if (argc != 3)
   {
     fprintf(stderr,
-            "Usage: %s <file>\nmakes <file>.[RC] from <file>.[dicz.int+parse].[RC]\n",
+            "Usage: %s <file> <report (0/1)>\nmakes <file>.[RC] from <file>.[dicz.int+parse].[RC]\n",
             argv[0]);
     exit(1);
   }
@@ -294,36 +294,40 @@ int main(int argc, char **argv)
   }
   fprintf(stderr, "Prefix-Free + Repair succeeded\n");
 
-  // get orginal size by measuring number of bytes in the original input
-  if (stat(argv[1], &s) != 0)
+  int report = atoi(argv[2]);
+  if (report)
   {
-    fprintf(stderr, "Cannot stat original input file %s\n", argv[1]);
-    fprintf(stderr, "Compression ratio estimate not available\n");
-    fprintf(stdout, "  Estimated output size (stdout): NaN\n"); // don't change this: est_size must be the the last printed item
-    exit(2);
-  }
+    // get orginal size by measuring number of bytes in the original input
+    if (stat(argv[1], &s) != 0)
+    {
+      fprintf(stderr, "Cannot stat original input file %s\n", argv[1]);
+      fprintf(stderr, "Compression ratio estimate not available\n");
+      fprintf(stdout, "  Estimated output size (stdout): NaN\n"); // don't change this: est_size must be the the last printed item
+      exit(2);
+    }
 
-  // estimate compression
-  // the estimate of the output size is done assuming we use
-  // a complete binary tree with 2r nodes to encode r rules.
-  // So we have:
-  //  1 bit per node (total 2r bits) to describe the shape of the binary tree
-  //     we do not explicitly represent non terminal (internal nodes)
-  //     we identify them in C with their preorder rank
-  //  log(alpha+r) bits for each symbol in C and each leaf in the
-  //               binary tree, total log(alpha+r)(C+r), here alpha=256
-  //               actually we could use just r*log(alpha) bits for the leaves
-  //               since they are non terminal
-  long u = s.st_size / sizeof(int);
-  rules += prules; // final number of rules
-  long est_size = (long)((2.0 * rules + ((double)bits(rules + alpha - 1)) * (rules + psizeC)) / 8) + 1;
-  fprintf(stderr, "  Original file size: %li (integers)\n", u);
-  fprintf(stderr, "  Size of the original input alphabet: %i\n", alpha);
-  fprintf(stderr, "  Number of rules: %i\n", rules);
-  fprintf(stderr, "  Final sequence length: %i (integers)\n", psizeC);
-  fprintf(stderr, "  Estimated output size (bytes): %ld\n", est_size);
-  fprintf(stderr, "  Compression ratio: %0.2f%%\n", (100.0 * 8 * est_size) / (u * bits(alpha - 1)));
-  fprintf(stdout, "  Estimated output size (stdout): %ld\n", est_size); // don't change this: est_size must be the the last printed item to stdout
+    // estimate compression
+    // the estimate of the output size is done assuming we use
+    // a complete binary tree with 2r nodes to encode r rules.
+    // So we have:
+    //  1 bit per node (total 2r bits) to describe the shape of the binary tree
+    //     we do not explicitly represent non terminal (internal nodes)
+    //     we identify them in C with their preorder rank
+    //  log(alpha+r) bits for each symbol in C and each leaf in the
+    //               binary tree, total log(alpha+r)(C+r), here alpha=256
+    //               actually we could use just r*log(alpha) bits for the leaves
+    //               since they are non terminal
+    long u = s.st_size / sizeof(int);
+    rules += prules; // final number of rules
+    long est_size = (long)((2.0 * rules + ((double)bits(rules + alpha - 1)) * (rules + psizeC)) / 8) + 1;
+    fprintf(stderr, "  Original file size: %li (integers)\n", u);
+    fprintf(stderr, "  Size of the original input alphabet: %i\n", alpha);
+    fprintf(stderr, "  Number of rules: %i\n", rules);
+    fprintf(stderr, "  Final sequence length: %i (integers)\n", psizeC);
+    fprintf(stderr, "  Estimated output size (bytes): %ld\n", est_size);
+    fprintf(stderr, "  Compression ratio: %0.2f%%\n", (100.0 * 8 * est_size) / (u * bits(alpha - 1)));
+    fprintf(stdout, "  Estimated output size (stdout): %ld\n", est_size); // don't change this: est_size must be the the last printed item to stdout
+  }
   fprintf(stderr, "=== postprocessing completed!\n");
   return 0;
 }
