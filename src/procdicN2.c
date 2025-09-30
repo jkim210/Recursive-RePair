@@ -52,7 +52,6 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  int count = 0; //Delete
   // main loop
   while (1)
   {
@@ -78,12 +77,11 @@ int main(int argc, char **argv)
         perror("Unexpected end of dictionary");
         exit(1);
       }
-      else if (c == 0 || c == 1 || c == 2) // These bytes are reserved in pfp++ and should not be present in text
+      else if (c == 2 || c == 4 || c == 5) // These bytes are reserved in pfp++ and should not be present in text
       {
-        count++; //Delete
+        fprintf(stdout, "Special PFP symbol %i is being skipped in procdicN2!\n", c);
         continue;
       }
-      count++; //Delete
       e = fwrite(&c, sizeof(int), 1, fo); // write char as an int to output file
       if (e != 1)
       {
@@ -91,7 +89,6 @@ int main(int argc, char **argv)
         exit(1);
       }
     }
-    count++; //Delete
     e = fwrite(&n, sizeof(int), 1, fo); // write terminator as an int to output file
     if (e != 1)
     {
@@ -106,7 +103,7 @@ int main(int argc, char **argv)
     perror("Unexpected trailing chars in dictionary");
     exit(1);
   }
-  fprintf(stderr, "Number of ints in .dicz.int : %i\n", count); //Delete
+  
   fclose(fo);
   fclose(fi);
   fprintf(stderr, "%i strings\n", n - 256);

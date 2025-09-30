@@ -68,7 +68,6 @@ int main(int argc, char **argv)
   // integer shift used in Marco's pfp
   int shift = atoi(argv[2]);
 
-  int count = 0; //Delete
   // main loop
   while (1)
   {
@@ -99,8 +98,9 @@ int main(int argc, char **argv)
         fprintf(stderr, "Dictionary symbol %x larger than %x\n", c, Unique - 1);
         exit(1);
       }
-      if (c == 0 || c == 1 || c == 2) // These bytes are reserved in pfp++ and should not be present in text
+      if (c == 2 || c == 4 || c == 5) // These bytes are reserved in pfp++ and should not be present in text
       {
+        fprintf(stdout, "Special PFP symbol %i is being skipped in iprocdicN2!\n", c);
         continue;
       }
       else
@@ -108,7 +108,6 @@ int main(int argc, char **argv)
         c = c - shift; // Undo the shift in Marco's PFP
       }
 
-      count++; //Delete
       e = fwrite(&c, sizeof(int), 1, fo); // write int to output file
       if (e != 1)
       {
@@ -116,7 +115,7 @@ int main(int argc, char **argv)
         exit(1);
       }
     }
-    count++; //Delete
+    
     e = fwrite(&n, sizeof(int), 1, fo); // write terminator as an int to output file
     if (e != 1)
     {
@@ -135,7 +134,7 @@ int main(int argc, char **argv)
     perror("Unexpected trailing chars in dictionary");
     exit(1);
   }
-  fprintf(stderr, "Number of ints in .parse.dicz.int : %i\n", count); //Delete
+
   fclose(fo);
   fclose(fi);
   fprintf(stderr, "%i strings\n", n - Unique);
