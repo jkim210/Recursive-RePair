@@ -100,7 +100,7 @@ int main(int argc, char **argv)
       }
       if (c == 2 || c == 4 || c == 5) // These bytes are reserved in pfp++ and should not be present in text
       {
-        fprintf(stdout, "Special PFP symbol %i is being skipped in iprocdicN2!\n", c);
+        //fprintf(stdout, "Special PFP symbol %i is being skipped in iprocdicN2!\n", c);
         continue;
       }
       else

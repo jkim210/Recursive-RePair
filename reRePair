@@ -91,7 +91,7 @@ def main():
         # Expects two inputs: {file}.dicz and {file}.len
         # {file}.dicz is the PFP dictionary without the ENDOFWORD symbol.
         # {file}.dicz contains the word lengths. It effectively replaces the need to include ENDOFWORD symbol in dictionary.
-        # It also removes the PFP special symbols that have byte values of 2,4,5 (0,1 should not be present)
+        # It also removes the PFP special symbols that have byte values of 2,4,5 (0,1 should not be present in dicz)
         # 0: ENDOFDICT
         # 1: ENDOFWORD
         # 2: DOLLAR

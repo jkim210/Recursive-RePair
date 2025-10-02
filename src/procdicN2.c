@@ -79,7 +79,7 @@ int main(int argc, char **argv)
       }
       else if (c == 2 || c == 4 || c == 5) // These bytes are reserved in pfp++ and should not be present in text
       {
-        fprintf(stdout, "Special PFP symbol %i is being skipped in procdicN2!\n", c);
+        //fprintf(stdout, "Special PFP symbol %i is being skipped in procdicN2!\n", c);
         continue;
       }
       e = fwrite(&c, sizeof(int), 1, fo); // write char as an int to output file
