@@ -65,6 +65,7 @@ To see all the options available, type on the command line:
 
 Please, if you use this tool in an academic setting cite the following paper:
 
+Justin Kim, Rahul Varki, Marco Oliva, and Christina Boucher. Re²Pair: Increasing the Scalability of RePair by Decreasing Memory Usage. In 32nd Annual European Symposium on Algorithms (ESA 2024). Leibniz International Proceedings in Informatics (LIPIcs), Volume 308, pp. 78:1-78:15, Schloss Dagstuhl – Leibniz-Zentrum für Informatik (2024) https://doi.org/10.4230/LIPIcs.ESA.2024.78
 
 ## Authors
 
